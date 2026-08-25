@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file. See [conven
 
 ### :bug: Bug Fixes:
 
+* update default browser intent to use Google and exclude Android package ([f9c296d4](https://github.com/CodeWorksCreativeHub/mLauncher/commit/f9c296d4))
 * Update showSoftInput flag in ViewExtensions ([b9a92651](https://github.com/CodeWorksCreativeHub/mLauncher/commit/b9a92651))
 
 ### :wrench: Code Quality:
