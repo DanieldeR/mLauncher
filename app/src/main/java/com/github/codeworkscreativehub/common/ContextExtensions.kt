@@ -258,9 +258,12 @@ fun Context.openWebBrowser() {
 
 
 fun Context.getDefaultBrowserPackageName(): String? {
-    val sendIntent = Intent(Intent.ACTION_VIEW, "https://".toUri())
+    val sendIntent = Intent(Intent.ACTION_VIEW, "https://google.com".toUri())
     val resolveInfo = packageManager.resolveActivity(sendIntent, PackageManager.MATCH_DEFAULT_ONLY)
-    return resolveInfo?.activityInfo?.packageName
+    return resolveInfo
+        ?.activityInfo
+        ?.packageName
+        ?.takeUnless { it == "android" }
 }
 
 
