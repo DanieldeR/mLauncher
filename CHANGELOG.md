@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. See [conven
 
 ### :bug: Bug Fixes:
 
+* correct wording in app-drawer alignment description ([6c731908](https://github.com/CodeWorksCreativeHub/mLauncher/commit/6c731908))
 * update Google Play badge URLs to use the correct endpoint ([62cfa25d](https://github.com/CodeWorksCreativeHub/mLauncher/commit/62cfa25d))
 
 ## [1120001 (1.12.0.1) - Multi Launcher ‧ Home Screen](https://github.com/CodeWorksCreativeHub/mLauncher/tree/1.12.0.1) - (30, August 2026)
