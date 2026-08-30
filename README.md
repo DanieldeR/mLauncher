@@ -75,7 +75,7 @@ We try to balance customizability and minimalization well still being simple :)<
         - Take A Screenshot
         - Disable Gesture
 - You can also position the clock independently of the home apps.
-- Change alignment of apps in app-drawer independent from homescreen.
+- Change alignment of apps in app-drawer independent of homescreen.
 - Change font size of sections of the homescreen independent of each other.
 - Removed internet permission. You never know what an app developer wants to know about you.
 - Lock settings behind biometrics (toggle)
