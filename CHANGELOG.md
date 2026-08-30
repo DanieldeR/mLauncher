@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
+## [1.12.0.1 → Unreleased](https://github.com/CodeWorksCreativeHub/mLauncher/tree/main) - In Development
+
+### :bug: Bug Fixes:
+
+* update Google Play badge URLs to use the correct endpoint ([62cfa25d](https://github.com/CodeWorksCreativeHub/mLauncher/commit/62cfa25d))
+
 ## [1120001 (1.12.0.1) - Multi Launcher ‧ Home Screen](https://github.com/CodeWorksCreativeHub/mLauncher/tree/1.12.0.1) - (30, August 2026)
 
 ### :sparkles: Enhancements:
