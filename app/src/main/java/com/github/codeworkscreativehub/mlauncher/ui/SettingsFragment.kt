@@ -60,6 +60,7 @@ import com.github.codeworkscreativehub.common.requestRuntimePermission
 import com.github.codeworkscreativehub.common.share.ShareUtils
 import com.github.codeworkscreativehub.common.showInstantToast
 import com.github.codeworkscreativehub.common.showShortToast
+import com.github.codeworkscreativehub.fork.ForkSettings
 import com.github.codeworkscreativehub.mlauncher.BuildConfig
 import com.github.codeworkscreativehub.mlauncher.MainActivity
 import com.github.codeworkscreativehub.mlauncher.MainViewModel
@@ -245,7 +246,8 @@ class SettingsFragment : BaseFragment() {
 
         val appListButtonOptionLabels = listOf(
             getLocalizedString(R.string.applist_button_web),
-            getLocalizedString(R.string.applist_button_contacts)
+            getLocalizedString(R.string.applist_button_contacts),
+            getLocalizedString(R.string.applist_button_ai)
         )
 
         // Look & Feel Settings
@@ -697,6 +699,8 @@ class SettingsFragment : BaseFragment() {
                         }
                     )
 
+                    ForkSettings(requireContext(), prefs, dialogBuilder, titleFontSize)
+
                     SettingsSwitch(
                         text = getLocalizedString(R.string.show_az_sidebar),
                         fontSize = titleFontSize,
@@ -929,7 +933,7 @@ class SettingsFragment : BaseFragment() {
 
                     val currentAppListFlags = remember {
                         mutableStateListOf<Boolean>().apply {
-                            addAll(prefs.getMenuFlags("APPLIST_BUTTON_FLAGS", "00"))
+                            addAll(prefs.getMenuFlags("APPLIST_BUTTON_FLAGS", "000"))
                         }
                     }
 
@@ -953,7 +957,7 @@ class SettingsFragment : BaseFragment() {
                                 context,
                                 appListButtonOptionLabels,
                                 "APPLIST_BUTTON_FLAGS",
-                                "00"
+                                "000"
                             ) { updatedFlags: List<Boolean> ->
                                 currentAppListFlags.clear()
                                 currentAppListFlags.addAll(updatedFlags)

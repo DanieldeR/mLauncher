@@ -36,6 +36,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.codeworkscreativehub.common.AppLogger
+import com.github.codeworkscreativehub.fork.DrawerSearchBar
 import com.github.codeworkscreativehub.common.getLocalizedString
 import com.github.codeworkscreativehub.common.hasSoftKeyboard
 import com.github.codeworkscreativehub.common.isGestureNavigationEnabled
@@ -65,6 +66,7 @@ import com.github.codeworkscreativehub.mlauncher.ui.adapter.ContactDrawerAdapter
 class AppDrawerFragment : BaseFragment() {
 
     private lateinit var prefs: Prefs
+    private lateinit var drawerSearchBar: DrawerSearchBar
     private lateinit var appsAdapter: AppDrawerAdapter
     private lateinit var contactsAdapter: ContactDrawerAdapter
 
@@ -135,6 +137,9 @@ class AppDrawerFragment : BaseFragment() {
                 appsAdapter.closeOpenedMenu()
             }
         }
+
+        drawerSearchBar = DrawerSearchBar(requireContext(), binding, prefs)
+        drawerSearchBar.attach()
 
         // Retrieve the letter key code from arguments
         val letterKeyCode = arguments?.getInt("letterKeyCode", -1)
@@ -249,8 +254,9 @@ class AppDrawerFragment : BaseFragment() {
             initViewModel(flag, viewModel, appAdapter, contactAdapter, profileType)
         }
 
-        binding.appsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.contactsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.appsRecyclerView.layoutManager = drawerSearchBar.layoutManager()
+        binding.contactsRecyclerView.layoutManager = drawerSearchBar.layoutManager()
+        binding.azSidebar.reversed = drawerSearchBar.atBottom
         binding.appsRecyclerView.adapter = appAdapter
         binding.contactsRecyclerView.adapter = contactAdapter
 
@@ -297,21 +303,21 @@ class AppDrawerFragment : BaseFragment() {
                 appAdapter?.closeOpenedMenu()
                 when (newState) {
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        onTop = !recyclerView.canScrollVertically(-1)
+                        onTop = drawerSearchBar.isAtListStart(recyclerView)
                         if (onTop) {
                             if (requireContext().hasSoftKeyboard()) {
                                 binding.search.hideKeyboard()
                             }
                         }
-                        if (onTop && !recyclerView.canScrollVertically(1)) {
+                        if (onTop && drawerSearchBar.isAtListEnd(recyclerView)) {
                             findNavController().popBackStack()
                         }
                     }
 
                     RecyclerView.SCROLL_STATE_IDLE -> {
-                        if (!recyclerView.canScrollVertically(1)) {
+                        if (drawerSearchBar.isAtListEnd(recyclerView)) {
                             binding.search.hideKeyboard()
-                        } else if (!recyclerView.canScrollVertically(-1)) {
+                        } else if (drawerSearchBar.isAtListStart(recyclerView)) {
                             if (onTop) {
                                 findNavController().popBackStack()
                             } else {
@@ -359,21 +365,21 @@ class AppDrawerFragment : BaseFragment() {
                 when (newState) {
 
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        onTop = !recyclerView.canScrollVertically(-1)
+                        onTop = drawerSearchBar.isAtListStart(recyclerView)
                         if (onTop) {
                             if (requireContext().hasSoftKeyboard()) {
                                 binding.search.hideKeyboard()
                             }
                         }
-                        if (onTop && !recyclerView.canScrollVertically(1)) {
+                        if (onTop && drawerSearchBar.isAtListEnd(recyclerView)) {
                             findNavController().popBackStack()
                         }
                     }
 
                     RecyclerView.SCROLL_STATE_IDLE -> {
-                        if (!recyclerView.canScrollVertically(1)) {
+                        if (drawerSearchBar.isAtListEnd(recyclerView)) {
                             binding.search.hideKeyboard()
-                        } else if (!recyclerView.canScrollVertically(-1)) {
+                        } else if (drawerSearchBar.isAtListStart(recyclerView)) {
                             if (onTop) {
                                 findNavController().popBackStack()
                             } else {
@@ -403,6 +409,7 @@ class AppDrawerFragment : BaseFragment() {
                             requireContext().searchCustomSearchEngine(query, prefs)
                         }
                     }
+                    drawerSearchBar.attachAiSearchButton { binding.search.query.toString() }
                     binding.searchSwitcher.apply {
                         if (hasContactsPermission(context)) {
                             when (profileType) {
@@ -450,8 +457,12 @@ class AppDrawerFragment : BaseFragment() {
                     when (binding.menuView.displayedChild) {
                         0 -> { // appsAdapter
                             val firstItem = appAdapter?.getFirstInList()
-                            if (firstItem.equals(searchQuery, ignoreCase = true) || prefs.openAppOnEnter) {
+                            val hasMatch = firstItem != null
+                            if (hasMatch && (firstItem.equals(searchQuery, ignoreCase = true) || prefs.openAppOnEnter)) {
                                 appAdapter?.launchFirstInList()
+                            } else if (flag == AppDrawerFlag.LaunchApp) {
+                                // No app to launch: hand the query over to the configured search engine
+                                requireContext().searchCustomSearchEngine(searchQuery, prefs)
                             } else {
                                 requireContext().searchOnPlayStore(searchQuery)
                             }
@@ -690,11 +701,6 @@ class AppDrawerFragment : BaseFragment() {
                 binding.sidebarContainer.isVisible = prefs.showAZSidebar
                 populateAppList(mergedList, appAdapter)
             }
-        }
-
-        // 🔹 Observe first open
-        viewModel.firstOpen.observe(viewLifecycleOwner) {
-            binding.appDrawerTip.isVisible = it
         }
     }
 

@@ -24,7 +24,16 @@ class AZSidebarView @JvmOverloads constructor(
     var onLetterSelected: ((String) -> Unit)? = null
 
     private val allLetters = listOf('★') + ('A'..'Z')
+    private var availableLetters: List<Char> = allLetters
     private var letters: List<Char> = allLetters
+
+    /** Draws the letters bottom up, to match an app list that is stacked from the bottom. */
+    var reversed: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            applyLetterOrder()
+        }
 
     private val baseTextSizeSp = 20f
     private val selectedTextSizeSp = baseTextSizeSp + 2f
@@ -156,7 +165,12 @@ class AZSidebarView @JvmOverloads constructor(
      * Example input: setOf("★", "A", "C", "D", "M")
      */
     fun setAvailableLetters(available: Set<String>) {
-        letters = allLetters.filter { it.toString() in available }
+        availableLetters = allLetters.filter { it.toString() in available }
+        applyLetterOrder()
+    }
+
+    private fun applyLetterOrder() {
+        letters = if (reversed) availableLetters.reversed() else availableLetters
 
         // Reset selection safely
         if (selectedIndex >= letters.size) {

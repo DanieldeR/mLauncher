@@ -42,32 +42,34 @@ extensions.configure<ApplicationExtension>("android") {
 
     flavorDimensions += "channel"
 
+    // This fork ships as dLauncher: its own application id, so it installs alongside upstream
+    // mLauncher on the same device instead of replacing it. See FORK.md.
     productFlavors {
         create("prod") {
             dimension = "channel"
-            applicationId = "app.mlauncher"
-            resValue("string", "app_name", "Multi Launcher")
+            applicationId = "app.dlauncher"
+            resValue("string", "app_name", "dLauncher")
         }
 
         create("beta") {
             dimension = "channel"
-            applicationId = "app.mlauncher.beta"
+            applicationId = "app.dlauncher.beta"
             versionNameSuffix = "-beta"
-            resValue("string", "app_name", "Multi Launcher Beta")
+            resValue("string", "app_name", "dLauncher Beta")
         }
 
         create("alpha") {
             dimension = "channel"
-            applicationId = "app.mlauncher.alpha"
+            applicationId = "app.dlauncher.alpha"
             versionNameSuffix = "-alpha"
-            resValue("string", "app_name", "Multi Launcher Alpha")
+            resValue("string", "app_name", "dLauncher Alpha")
         }
 
         create("nightly") {
             dimension = "channel"
-            applicationId = "app.mlauncher.nightly"
+            applicationId = "app.dlauncher.nightly"
             versionNameSuffix = "-nightly"
-            resValue("string", "app_name", "Multi Launcher Nightly")
+            resValue("string", "app_name", "dLauncher Nightly")
         }
     }
 
@@ -97,7 +99,7 @@ extensions.configure<ApplicationExtension>("android") {
             signingConfig = signingConfigs["release"]
 
             resValue("string", "app_version", baseVersionCode.toString())
-            resValue("string", "app_name", "Multi Launcher Debug")
+            resValue("string", "app_name", "dLauncher Debug")
             resValue("string", "empty", "")
         }
 
