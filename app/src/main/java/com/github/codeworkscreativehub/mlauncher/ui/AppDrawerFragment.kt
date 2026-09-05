@@ -36,6 +36,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.codeworkscreativehub.common.AppLogger
+import com.github.codeworkscreativehub.fork.DrawerSearchBar
 import com.github.codeworkscreativehub.common.getLocalizedString
 import com.github.codeworkscreativehub.common.hasSoftKeyboard
 import com.github.codeworkscreativehub.common.isGestureNavigationEnabled
@@ -65,6 +66,7 @@ import com.github.codeworkscreativehub.mlauncher.ui.adapter.ContactDrawerAdapter
 class AppDrawerFragment : BaseFragment() {
 
     private lateinit var prefs: Prefs
+    private lateinit var drawerSearchBar: DrawerSearchBar
     private lateinit var appsAdapter: AppDrawerAdapter
     private lateinit var contactsAdapter: ContactDrawerAdapter
 
@@ -135,6 +137,8 @@ class AppDrawerFragment : BaseFragment() {
                 appsAdapter.closeOpenedMenu()
             }
         }
+
+        drawerSearchBar = DrawerSearchBar(requireContext(), binding, prefs)
 
         // Retrieve the letter key code from arguments
         val letterKeyCode = arguments?.getInt("letterKeyCode", -1)
@@ -403,6 +407,7 @@ class AppDrawerFragment : BaseFragment() {
                             requireContext().searchCustomSearchEngine(query, prefs)
                         }
                     }
+                    drawerSearchBar.attachAiSearchButton { binding.search.query.toString() }
                     binding.searchSwitcher.apply {
                         if (hasContactsPermission(context)) {
                             when (profileType) {
