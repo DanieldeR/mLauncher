@@ -450,8 +450,12 @@ class AppDrawerFragment : BaseFragment() {
                     when (binding.menuView.displayedChild) {
                         0 -> { // appsAdapter
                             val firstItem = appAdapter?.getFirstInList()
-                            if (firstItem.equals(searchQuery, ignoreCase = true) || prefs.openAppOnEnter) {
+                            val hasMatch = firstItem != null
+                            if (hasMatch && (firstItem.equals(searchQuery, ignoreCase = true) || prefs.openAppOnEnter)) {
                                 appAdapter?.launchFirstInList()
+                            } else if (flag == AppDrawerFlag.LaunchApp) {
+                                // No app to launch: hand the query over to the configured search engine
+                                requireContext().searchCustomSearchEngine(searchQuery, prefs)
                             } else {
                                 requireContext().searchOnPlayStore(searchQuery)
                             }
