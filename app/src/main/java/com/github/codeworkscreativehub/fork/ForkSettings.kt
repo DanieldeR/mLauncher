@@ -24,7 +24,32 @@ fun ForkSettings(
     dialogBuilder: DialogManager,
     fontSize: TextUnit,
 ) {
+    var searchBarPosition by remember { mutableStateOf(prefs.searchBarPosition) }
     var aiSearchApp by remember { mutableStateOf(prefs.aiSearchApp) }
+
+    SettingsSelect(
+        title = getLocalizedString(R.string.search_bar_position),
+        option = searchBarPosition.string(),
+        fontSize = fontSize,
+        onClick = {
+            val positions = SearchBarPosition.entries
+            val labels = positions.map { it.getString() }
+
+            dialogBuilder.showSingleChoiceBottomSheet(
+                context = context,
+                options = labels.toTypedArray(),
+                title = getLocalizedString(R.string.search_bar_position),
+                selectedIndex = positions.indexOf(searchBarPosition).takeIf { it >= 0 } ?: 0,
+                onItemSelected = { selectedLabel ->
+                    val index = labels.indexOfFirst { it == selectedLabel }
+                    if (index != -1) {
+                        searchBarPosition = positions[index]
+                        prefs.searchBarPosition = positions[index]
+                    }
+                }
+            )
+        }
+    )
 
     SettingsSelect(
         title = getLocalizedString(R.string.ai_search_app),

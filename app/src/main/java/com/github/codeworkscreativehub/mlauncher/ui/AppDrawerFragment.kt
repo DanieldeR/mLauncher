@@ -139,6 +139,7 @@ class AppDrawerFragment : BaseFragment() {
         }
 
         drawerSearchBar = DrawerSearchBar(requireContext(), binding, prefs)
+        drawerSearchBar.attach()
 
         // Retrieve the letter key code from arguments
         val letterKeyCode = arguments?.getInt("letterKeyCode", -1)
@@ -253,8 +254,9 @@ class AppDrawerFragment : BaseFragment() {
             initViewModel(flag, viewModel, appAdapter, contactAdapter, profileType)
         }
 
-        binding.appsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.contactsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.appsRecyclerView.layoutManager = drawerSearchBar.layoutManager()
+        binding.contactsRecyclerView.layoutManager = drawerSearchBar.layoutManager()
+        binding.azSidebar.reversed = drawerSearchBar.atBottom
         binding.appsRecyclerView.adapter = appAdapter
         binding.contactsRecyclerView.adapter = contactAdapter
 
@@ -301,21 +303,21 @@ class AppDrawerFragment : BaseFragment() {
                 appAdapter?.closeOpenedMenu()
                 when (newState) {
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        onTop = !recyclerView.canScrollVertically(-1)
+                        onTop = drawerSearchBar.isAtListStart(recyclerView)
                         if (onTop) {
                             if (requireContext().hasSoftKeyboard()) {
                                 binding.search.hideKeyboard()
                             }
                         }
-                        if (onTop && !recyclerView.canScrollVertically(1)) {
+                        if (onTop && drawerSearchBar.isAtListEnd(recyclerView)) {
                             findNavController().popBackStack()
                         }
                     }
 
                     RecyclerView.SCROLL_STATE_IDLE -> {
-                        if (!recyclerView.canScrollVertically(1)) {
+                        if (drawerSearchBar.isAtListEnd(recyclerView)) {
                             binding.search.hideKeyboard()
-                        } else if (!recyclerView.canScrollVertically(-1)) {
+                        } else if (drawerSearchBar.isAtListStart(recyclerView)) {
                             if (onTop) {
                                 findNavController().popBackStack()
                             } else {
@@ -363,21 +365,21 @@ class AppDrawerFragment : BaseFragment() {
                 when (newState) {
 
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        onTop = !recyclerView.canScrollVertically(-1)
+                        onTop = drawerSearchBar.isAtListStart(recyclerView)
                         if (onTop) {
                             if (requireContext().hasSoftKeyboard()) {
                                 binding.search.hideKeyboard()
                             }
                         }
-                        if (onTop && !recyclerView.canScrollVertically(1)) {
+                        if (onTop && drawerSearchBar.isAtListEnd(recyclerView)) {
                             findNavController().popBackStack()
                         }
                     }
 
                     RecyclerView.SCROLL_STATE_IDLE -> {
-                        if (!recyclerView.canScrollVertically(1)) {
+                        if (drawerSearchBar.isAtListEnd(recyclerView)) {
                             binding.search.hideKeyboard()
-                        } else if (!recyclerView.canScrollVertically(-1)) {
+                        } else if (drawerSearchBar.isAtListStart(recyclerView)) {
                             if (onTop) {
                                 findNavController().popBackStack()
                             } else {
@@ -699,11 +701,6 @@ class AppDrawerFragment : BaseFragment() {
                 binding.sidebarContainer.isVisible = prefs.showAZSidebar
                 populateAppList(mergedList, appAdapter)
             }
-        }
-
-        // 🔹 Observe first open
-        viewModel.firstOpen.observe(viewLifecycleOwner) {
-            binding.appDrawerTip.isVisible = it
         }
     }
 

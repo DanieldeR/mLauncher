@@ -4,8 +4,14 @@
   constantly, so that rebases never conflict over them.
 -->
 <resources>
+    <string name="search_bar_position">Search Bar Position</string>
+    <string name="search_bar_position_top">Top</string>
+    <string name="search_bar_position_bottom">Bottom</string>
     <string name="ai_search_app">AI Search App</string>
     <string name="ai_search_app_unset">Choose an AI search app in settings first</string>
     <string name="ai_search_app_failed">%1$s could not handle the search</string>
     <string name="applist_button_ai">AI</string>
+
+    <!-- Matches the search bar top margin upstream hardcodes in fragment_app_drawer.xml. -->
+    <dimen name="fork_app_drawer_top_margin">34dp</dimen>
 </resources>
