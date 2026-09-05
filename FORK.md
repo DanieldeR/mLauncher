@@ -14,6 +14,28 @@ kept close enough to upstream that it can be rebased onto it periodically.
 Behaviour intentionally dropped from upstream: the first-open tip in the app drawer is no longer
 shown. The view is still in the layout; only the observer that made it visible is gone.
 
+## dLauncher, not mLauncher
+
+The fork installs as **dLauncher**, alongside an existing mLauncher rather than as an update to it.
+Only the application id is renamed (`app.mlauncher*` to `app.dlauncher*`, per flavour). The Kotlin
+namespace stays `com.github.codeworkscreativehub.mlauncher`, because Android decides what counts as
+the same app from the application id alone; renaming source packages would mean rewriting every
+file in the project for no functional gain.
+
+Two resource files name the application id directly and were repointed with it:
+`res/xml/accessibility_service_config.xml` (which packages the accessibility service listens to)
+and `res/xml/blacklist.xml` (which packages are left out of usage stats; upstream's id is kept
+there too, so a side-by-side mLauncher is also excluded).
+
+Left pointing at upstream on purpose: the Play Store URLs in `helper/SystemUtils.kt` and the
+`app.mlauncher.APPLY_ICONS` broadcast, which icon packs send by name.
+
+Signing is unchanged and still requires upstream's setup: `signingConfigs` reads
+`KEY_STORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD` at configuration time and the debug build type
+signs with that same config, so *any* Gradle invocation fails without them and `app/mLauncher.jks`.
+To build this fork, either generate a keystore and set those three variables (in CI, also set
+`SIGNINGKEY_BASE64`), or change the debug build type to use Gradle's default debug signing config.
+
 ## How the fork is structured
 
 Everything the fork owns lives in files upstream does not have:
@@ -48,6 +70,9 @@ last 12 months, so it is roughly how likely each anchor is to conflict.
 | `ui/AppDrawerFragment.kt` | +22 / -16 | 7 | `DrawerSearchBar` field and `attach()` after the `binding.apply { ... }` block; `layoutManager()` for both recyclers; four `canScrollVertically` call sites in the two scroll listeners; `attachAiSearchButton` in the `LaunchApp` branch; the enter-to-search branch in `onQueryTextSubmit`; the deleted `firstOpen` tip observer. |
 | `ui/SettingsFragment.kt` | +7 / -3 | 8 | Third entry in `appListButtonOptionLabels`; `"00"` → `"000"` in both `APPLIST_BUTTON_FLAGS` defaults; one `ForkSettings(...)` call after the search engine row. |
 | `ui/components/AZSidebarView.kt` | +15 / -1 | 2 | `reversed` property and `applyLetterOrder()`, so the sidebar can draw bottom up. |
+| `app/build.gradle.kts` | +11 / -9 | 53 | Four flavour `applicationId` and `app_name` values, and the debug build type's `app_name`. The churn is almost all version bumps at the top of the file, which this fork never touches, so these lines rarely conflict in practice. On conflict, keep the `app.dlauncher` ids. |
+| `res/xml/accessibility_service_config.xml` | +1 / -1 | 0 | `packageNames` follows the application id. |
+| `res/xml/blacklist.xml` | +1 | 0 | Fork's own id excluded from usage stats. |
 
 If upstream rewrites the app drawer's inset handling or its scroll listeners, those are the two
 places to re-read carefully; everything else is additive.
@@ -85,6 +110,7 @@ After a rebase, before force pushing:
 
 Then check by hand, since none of this is covered by tests:
 
+- The installed app is called dLauncher and sits next to mLauncher rather than replacing it.
 - App drawer opens with the search bar above the keyboard, results stacked upwards.
 - Enter with no matching app opens the search engine; enter on an exact match still launches it.
 - The AI button appears when enabled in Settings → App List Buttons and hands a query over.
